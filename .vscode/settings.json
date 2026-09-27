@@ -1,4 +1,6 @@
 {
+  "prisma.pinToPrisma6": true,
+  "prisma.enableDiagnostics": false,
   "cSpell.words": [
     "mindshare"
   ]
