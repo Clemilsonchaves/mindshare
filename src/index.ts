@@ -13,12 +13,27 @@ import { VoteResolver } from './resolvers/vote.resolver.js'
 
 async function bootstrap() {
   const app = express()
+  const allowedOrigins = new Set([
+    'http://localhost:5173',
+    'http://127.0.0.1:5173',
+    'https://studio.apollographql.com',
+    'https://embeddable-sandbox.cdn.apollographql.com',
+  ])
 
   // Habilitar CORS
-  app.use(cors({
-    origin: 'http://localhost:5173',
-    credentials: true,
-  }))
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || allowedOrigins.has(origin)) {
+          callback(null, true)
+          return
+        }
+
+        callback(new Error('Origem não permitida pelo CORS'))
+      },
+      credentials: true,
+    })
+  )
 
   const schema = await buildSchema({
     resolvers: [
@@ -38,13 +53,17 @@ async function bootstrap() {
 
   await server.start()
 
+  const graphqlHandler = expressMiddleware(server, {
+    context: buildContext,
+  })
+
   app.use(
     '/graphql',
     express.json(),
-    expressMiddleware(server, {
-      context: buildContext,
-    })
+    graphqlHandler
   )
+
+  app.all('/', express.json(), graphqlHandler)
 
   app.listen(
     {

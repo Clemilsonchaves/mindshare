@@ -39,6 +39,11 @@ export class UserResolver {
     return this.userService.findUser(id)
   }
 
+  @Query(() => UserModel)
+  async me(@Ctx() ctx: GraphqlContext): Promise<UserModel> {
+    return this.userService.findUser(ctx.user!)
+  }
+
   @Query(() => [UserModel])
   async listUsers(): Promise<UserModel[]> {
     return this.userService.listUsers()

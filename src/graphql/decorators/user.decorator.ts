@@ -15,9 +15,14 @@ export const GqlUser = () => {
           },
         })
         if (!user) throw new Error('Usuário não encontrado')
-        return user
+        return {
+          ...user,
+          password: user.password ?? undefined,
+          role: user.role ?? undefined,
+        }
       } catch (error) {
         console.log('Error ao instanciar o gqluser')
+        return null
       }
     }
   )

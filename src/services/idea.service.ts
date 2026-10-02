@@ -2,18 +2,28 @@ import { prismaClient } from '../../prisma/prisma.js'
 import { CreateIdeaInput, UpdateIdeaInput } from '../dtos/input/idea.input.js'
 
 export class IdeaService {
+  private normalizeIdea<T extends { description: string | null }>(idea: T) {
+    return {
+      ...idea,
+      description: idea.description ?? undefined,
+    }
+  }
+
   async createIdea(data: CreateIdeaInput, authorId: string) {
-    return prismaClient.idea.create({
+    const idea = await prismaClient.idea.create({
       data: {
         title: data.title,
         description: data.description,
         authorId: authorId,
       },
     })
+
+    return this.normalizeIdea(idea)
   }
 
   async listIdeas() {
-    return prismaClient.idea.findMany()
+    const ideas = await prismaClient.idea.findMany()
+    return ideas.map((idea) => this.normalizeIdea(idea))
   }
 
   async deleteIdea(id: string) {
@@ -47,7 +57,7 @@ export class IdeaService {
 
     if (!idea) throw new Error('Ideia não encontrada')
 
-    return idea
+    return this.normalizeIdea(idea)
   }
 
   async updateIdea(id: string, data: UpdateIdeaInput) {
@@ -59,12 +69,14 @@ export class IdeaService {
 
     if (!idea) throw new Error('Ideia não encontrada')
 
-    return prismaClient.idea.update({
+    const updatedIdea = await prismaClient.idea.update({
       where: { id },
       data: {
         title: data.title,
         description: data.description,
       },
     })
+
+    return this.normalizeIdea(updatedIdea)
   }
 }
