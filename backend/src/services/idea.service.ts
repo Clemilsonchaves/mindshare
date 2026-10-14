@@ -1,8 +1,16 @@
 import { prismaClient } from '../../prisma/prisma.js'
 import { CreateIdeaInput, UpdateIdeaInput } from '../dtos/input/idea.input.js'
+import { IdeaModel } from '../models/idea.model.js'
 
 export class IdeaService {
-  private normalizeIdea<T extends { description: string | null }>(idea: T) {
+  private normalizeIdea<T extends {
+    id: string
+    title: string
+    description: string | null
+    authorId: string
+    createdAt: Date
+    updatedAt: Date
+  }>(idea: T): IdeaModel {
     return {
       ...idea,
       description: idea.description ?? undefined,
@@ -40,12 +48,14 @@ export class IdeaService {
     })
   }
 
-  async findIdeaById(id: string) {
-    return prismaClient.idea.findUnique({
+  async findIdeaById(id: string): Promise<IdeaModel | null> {
+    const idea = await prismaClient.idea.findUnique({
       where: {
         id,
       },
     })
+
+    return idea ? this.normalizeIdea(idea) : null
   }
 
   async getIdea(id: string) {

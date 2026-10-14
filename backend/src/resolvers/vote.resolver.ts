@@ -24,8 +24,8 @@ export class VoteResolver {
     return this.voteService.toggleVote(user.id, ideaId)
   }
 
-  @FieldResolver(() => IdeaModel)
-  async idea(@Root() vote: VoteModel): Promise<IdeaModel> {
+  @FieldResolver(() => IdeaModel, { nullable: true })
+  async idea(@Root() vote: VoteModel): Promise<IdeaModel | null> {
     return this.ideaService.findIdeaById(vote.ideaId)
   }
 

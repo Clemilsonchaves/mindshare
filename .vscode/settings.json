@@ -2,6 +2,13 @@
   "prisma.pinToPrisma6": true,
   "prisma.enableDiagnostics": false,
   "cSpell.words": [
-    "mindshare"
+    "dtos",
+    "encontrada",
+    "encontrado",
+    "gqluser",
+    "Ideia",
+    "instanciar",
+    "mindshare",
+    "Usuário"
   ]
 }
